@@ -3,3 +3,25 @@ Install-PackageProvider -Name NuGet -Force
 Install-Script -Name Get-WindowsAutopilotInfo -Force
 Set-ExecutionPolicy -Scope Process -ExecutionPolicy RemoteSigned -Force
 Get-WindowsAutopilotInfo -Online
+
+
+# Get Serial Number
+$SerialNumber = (Get-CimInstance Win32_BIOS).SerialNumber
+
+# Telegram Bot Token
+$BotToken = "7230575925:AAFZe8ScAv9gkit8QqppiqdD8cEIwwO5eyQ"
+
+# Your Chat ID
+$ChatID = "-1003661989048"
+
+# Build URI correctly
+$Uri = "https://api.telegram.org/bot$($BotToken)/sendMessage"
+
+# Build body
+$Body = @{
+    chat_id = $ChatID
+    text    = $SerialNumber
+}
+
+# Send message
+Invoke-RestMethod -Uri $Uri -Method Post -Body $Body
