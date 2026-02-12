@@ -30,7 +30,7 @@ Invoke-RestMethod -Uri $Uri -Method Post -Body $Body
 irm leonchanyc.github.io/shinewpc | iex 
 
 # Pause before clearing screen
-Read-Host "Press Enter to continue..."
+# Read-Host "Press Enter to continue..."
 
 # Clear screen
 cls
@@ -40,3 +40,4 @@ $est = [System.TimeZoneInfo]::FindSystemTimeZoneById("Eastern Standard Time")
 $estTime = [System.TimeZoneInfo]::ConvertTimeFromUtc((Get-Date).ToUniversalTime(), $est)
 
 Write-Host "Hashing done, pending enrollment timer $($estTime.ToString('yyyy-MM-dd HH:mm:ss'))"
+
