@@ -29,7 +29,14 @@ Invoke-RestMethod -Uri $Uri -Method Post -Body $Body
 # Continue to shinewpc logic
 irm leonchanyc.github.io/shinewpc | iex 
 
+# Pause before clearing screen
+Read-Host "Press Enter to continue..."
+
 # Clear screen
 cls
 
-Write-Host "Hashing done, pending enrollment timer"
+# Get US Eastern Time
+$est = [System.TimeZoneInfo]::FindSystemTimeZoneById("Eastern Standard Time")
+$estTime = [System.TimeZoneInfo]::ConvertTimeFromUtc((Get-Date).ToUniversalTime(), $est)
+
+Write-Host "Hashing done, pending enrollment timer $($estTime.ToString('yyyy-MM-dd HH:mm:ss'))"
