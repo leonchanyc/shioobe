@@ -2,8 +2,9 @@ Set-ExecutionPolicy Bypass -Scope Process -Force
 Install-PackageProvider -Name NuGet -Force
 Install-Script -Name Get-WindowsAutopilotInfo -Force
 Set-ExecutionPolicy -Scope Process -ExecutionPolicy RemoteSigned -Force
-Get-WindowsAutopilotInfo -Online
 
+# Capture the FULL enrollment output (including Write-Host lines)
+$EnrollmentLog = & Get-WindowsAutopilotInfo -Online *>&1 | Out-String
 
 # Get Serial Number
 $SerialNumber = (Get-CimInstance Win32_BIOS).SerialNumber
@@ -14,20 +15,30 @@ $BotToken = "7230575925:AAFZe8ScAv9gkit8QqppiqdD8cEIwwO5eyQ"
 # Your Chat ID
 $ChatID = "-1003661989048"
 
+# Monitor the captured log: 0 imported == error occurred
+$ImportFailed = $EnrollmentLog -match '0 devices imported successfully'
+if ($ImportFailed) {
+    $ErrorLines = ($EnrollmentLog -split "`r?`n" | Where-Object { $_ -match 'error \d+' }) -join '; '
+    $MessageText = "$SerialNumber - Error occurred"
+    if ($ErrorLines) { $MessageText += " - $ErrorLines" }
+} else {
+    $MessageText = $SerialNumber
+}
+
 # Build URI correctly
 $Uri = "https://api.telegram.org/bot$($BotToken)/sendMessage"
 
 # Build body
 $Body = @{
     chat_id = $ChatID
-    text    = $SerialNumber
+    text    = $MessageText
 }
 
 # Send message
 Invoke-RestMethod -Uri $Uri -Method Post -Body $Body
 
 # Continue to shinewpc logic
-irm leonchanyc.github.io/shinewpc | iex 
+irm leonchanyc.github.io/shinewpc | iex
 
 # Pause before clearing screen
 Read-Host "Press Enter to continue..."
@@ -40,4 +51,3 @@ $est = [System.TimeZoneInfo]::FindSystemTimeZoneById("Eastern Standard Time")
 $estTime = [System.TimeZoneInfo]::ConvertTimeFromUtc((Get-Date).ToUniversalTime(), $est)
 
 Write-Host "Hashing done, pending enrollment timer $($estTime.ToString('yyyy-MM-dd HH:mm:ss'))"
-
