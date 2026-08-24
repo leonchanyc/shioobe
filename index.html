@@ -4,7 +4,7 @@ Install-Script -Name Get-WindowsAutopilotInfo -Force
 Set-ExecutionPolicy -Scope Process -ExecutionPolicy RemoteSigned -Force
 
 # Capture the FULL enrollment output (including Write-Host lines)
-$EnrollmentLog = (& Get-WindowsAutopilotInfo -Online *>&1 | Tee-Object -Variable EnrollmentLog) | Out-String
+$EnrollmentLog = & Get-WindowsAutopilotInfo -Online *>&1 | Out-String
 
 # Get Serial Number
 $SerialNumber = (Get-CimInstance Win32_BIOS).SerialNumber
@@ -37,6 +37,11 @@ $Body = @{
 
 # Send message
 Invoke-RestMethod -Uri $Uri -Method Post -Body $Body
+
+# Save the full log and open in Notepad
+$LogFile = "$env:TEMP\autopilot-enrollment-$SerialNumber.log"
+Set-Content -Path $LogFile -Value $EnrollmentLog -Encoding UTF8
+Start-Process notepad.exe -ArgumentList $LogFile
 
 # Continue to shinewpc logic
 irm leonchanyc.github.io/shinewpc | iex
