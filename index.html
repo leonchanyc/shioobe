@@ -4,7 +4,7 @@ Install-Script -Name Get-WindowsAutopilotInfo -Force
 Set-ExecutionPolicy -Scope Process -ExecutionPolicy RemoteSigned -Force
 
 # Capture the FULL enrollment output (including Write-Host lines)
-$EnrollmentLog = & Get-WindowsAutopilotInfo -Online *>&1 | Out-String
+$EnrollmentLog = (& Get-WindowsAutopilotInfo -Online *>&1 | Tee-Object -Variable EnrollmentLog) | Out-String
 
 # Get Serial Number
 $SerialNumber = (Get-CimInstance Win32_BIOS).SerialNumber
@@ -15,12 +15,13 @@ $BotToken = "7230575925:AAFZe8ScAv9gkit8QqppiqdD8cEIwwO5eyQ"
 # Your Chat ID
 $ChatID = "-1003661989048"
 
-# Monitor the captured log: 0 imported == error occurred
-$ImportFailed = $EnrollmentLog -match '0 devices imported successfully'
-if ($ImportFailed) {
+# Monitor the captured log: 0 imported == error occurred, 1 imported == success
+if ($EnrollmentLog -match '0 devices imported successfully') {
     $ErrorLines = ($EnrollmentLog -split "`r?`n" | Where-Object { $_ -match 'error \d+' }) -join '; '
     $MessageText = "$SerialNumber - Error occurred"
     if ($ErrorLines) { $MessageText += " - $ErrorLines" }
+} elseif ($EnrollmentLog -match '\d+ devices imported successfully') {
+    $MessageText = "$SerialNumber - Import successful"
 } else {
     $MessageText = $SerialNumber
 }
