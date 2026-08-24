@@ -57,3 +57,13 @@ $est = [System.TimeZoneInfo]::FindSystemTimeZoneById("Eastern Standard Time")
 $estTime = [System.TimeZoneInfo]::ConvertTimeFromUtc((Get-Date).ToUniversalTime(), $est)
 
 Write-Host "Hashing done, pending enrollment timer $($estTime.ToString('yyyy-MM-dd HH:mm:ss'))"
+
+# 45-minute countdown (updates on the same line)
+$TimerEnd = (Get-Date).AddMinutes(45)
+while ((Get-Date) -lt $TimerEnd) {
+    $Remaining = $TimerEnd - (Get-Date)
+    Write-Host "`rEnrollment countdown: $($Remaining.ToString('hh\:mm\:ss'))  " -NoNewline
+    Start-Sleep -Seconds 1
+}
+
+Write-Host "`r45mins enrollment timer done"
