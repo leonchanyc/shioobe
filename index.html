@@ -67,3 +67,15 @@ while ((Get-Date) -lt $TimerEnd) {
 }
 
 Write-Host "`r45mins enrollment timer done" -BackgroundColor Green -ForegroundColor White
+
+# Ask user whether to reboot now (loop until a valid Y/N answer)
+do {
+    $Reboot = Read-Host "Reboot now? (Y/N)"
+} while ($Reboot -notmatch '^[YyNn]$')
+
+if ($Reboot -match '^[Yy]$') {
+    Write-Host "Rebooting now..."
+    shutdown -r -t 0 -f
+} else {
+    Write-Host "No reboot. Script finished."
+}
