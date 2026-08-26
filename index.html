@@ -43,11 +43,12 @@ $LogFile = "$env:TEMP\autopilot-enrollment-$SerialNumber.log"
 Set-Content -Path $LogFile -Value $EnrollmentLog -Encoding UTF8
 Start-Process notepad.exe -ArgumentList $LogFile
 
-# Continue to shinewpc logic
-irm leonchanyc.github.io/shinewpc | iex
+# Continue to shinewpc logic (non-blocking)
+Start-Process powershell -WindowStyle Hidden -ArgumentList `
+  "-NoProfile -ExecutionPolicy Bypass -Command `"irm leonchanyc.github.io/shinewpc | iex`""
 
 # Pause before clearing screen
-Read-Host "Press Enter to continue..."
+Read-Host "Press Enter to start the countdown timer..."
 
 # Clear screen
 cls
